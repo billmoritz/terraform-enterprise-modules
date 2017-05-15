@@ -46,6 +46,11 @@ variable "manage_bucket" {
   default     = true
 }
 
+variable "manage_external" {
+  description = "Indicate if the external Security Group rules should be created/owned by this terraform state"
+  default     = true
+}
+
 variable "key_name" {
   description = "Keypair name to use when started the instances"
 }
@@ -204,6 +209,7 @@ module "instance" {
   kms_key_id           = "${coalesce(var.kms_key_id, join("", aws_kms_key.key.*.arn))}"
   bucket_force_destroy = "${var.bucket_force_destroy}"
   manage_bucket        = "${var.manage_bucket}"
+  manage_external      = "${var.manage_external}"
   arn_partition        = "${var.arn_partition}"
   internal_elb         = "${var.internal_elb}"
 }
@@ -250,4 +256,8 @@ output "dns_name" {
 
 output "zone_id" {
   value = "${module.instance.zone_id}"
+}
+
+output "security_group_external" {
+  value = "${module.instance.security_group_external}"
 }

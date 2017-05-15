@@ -41,6 +41,10 @@ variable "internal_elb" {
   default = false
 }
 
+variable "manage_external" {
+  default = true
+}
+
 resource "aws_security_group" "ptfe" {
   vpc_id = "${var.vpc_id}"
 
@@ -82,39 +86,25 @@ resource "aws_security_group" "ptfe" {
 resource "aws_security_group" "ptfe-external" {
   vpc_id = "${var.vpc_id}"
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # TCP All outbound traffic
-  egress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # UDP All outbound traffic
-  egress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags {
     Name = "terraform-enterprise-external"
   }
+}
+
+resource "aws_security_group_rule" "ptfe-external-80" {
+  count       = "${var.manage_external ? 1 : 0}"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "ptfe-external-443" {
+  count       = "${var.manage_external ? 1 : 0}"
+  from_port   = 443
+  to_port     = 443
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_launch_configuration" "ptfe" {
@@ -239,4 +229,8 @@ output "zone_id" {
 
 output "hostname" {
   value = "${var.hostname}"
+}
+
+output "security_group_external" {
+  value = "${aws_security_group.ptfe-external.id}"
 }

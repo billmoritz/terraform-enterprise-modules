@@ -53,6 +53,7 @@ The following variables are required inputs and must be populated prior to begin
 These variables can be populated, but they have defaults that can also be used.
 
 * `manage_bucket`: Indicate if this terraform state should create and own the bucket. Set this to false if you are reusing an existing bucket.
+* `manage_external`: Indicate if this terraform state should create external security group rules. Set this to false if you would like to write your own rules.
 * `kms_key_id`: Specify the ARN for a KMS key to use rather than having one
   created automatically.
 * `db_username` Username that will be used to access RDS. Default: `atlas`
@@ -87,4 +88,6 @@ To upgrade your instance of Terraform Enterprise, simply update the repository c
    hostname to this value.
 * `zone_id` - The Route53 Zone ID of the load balancer for TFE. If you are
    managing DNS separately but still using Route53, this value may be useful.
+* `security_groups_external` - The id of the security group that is associated
+   with the external load balancer.
 * `url` - The URL where TFE will become available when it boots.
